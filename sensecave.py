@@ -36,7 +36,7 @@ y = 1
 # Function to draw a single cell. Withe the opens if there
 def draw_sense(cell):
     sense.clear()  # Blank the LED matrix
-
+   
     for side in range (0,8):
         if side == 3 or side == 4:
             if( cell & 128) == 128:
@@ -135,8 +135,6 @@ for extra in range (0,10):
 	
     
 
-
-
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -150,7 +148,15 @@ while running:
             print y
             print maze[y][x]
             draw_sense(maze[y][x])
-            
+            if y == 0 and x == 0:
+                sense.set_pixel(1,1,255,0,0)
+            elif y == 0 and x == 7:
+                sense.set_pixel(6,1,255,0,0)
+            elif y == 7 and x == 0:
+                sense.set_pixel(1,6,255,0,0)
+            elif y == 7 and x == 7:
+                sense.set_pixel(6,6,255,0,0)
+
             if event.key == K_RETURN:
                 running = False            
 
