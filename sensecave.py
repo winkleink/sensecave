@@ -120,24 +120,25 @@ for extra in range (0,10):
     print "siderand " + str(siderand)
     print "siderand power is "+ str(int(math.pow(2, siderand+4)))
     print "maze before or "+ str(maze[yrand][xrand])
-    maze[yrand][xrand] = maze[yrand][xrand] | int(math.pow(2,siderand+4))
-    print "maze after or " + str(maze[yrand][xrand])
+    if maze[yrand][xrand] + pow(2,siderand+4) != 240: # make sure no cell is completely blocked in
+        maze[yrand][xrand] = maze[yrand][xrand] | int(math.pow(2,siderand+4))
+        print "maze after or " + str(maze[yrand][xrand])
 
-    if siderand == 0: # set cell to the left closed also
-        if xrand != 0:
-            maze[yrand][xrand-1] = maze[yrand][xrand-1] | 64
+        if siderand == 0: # set cell to the left closed also
+            if xrand != 0:
+                maze[yrand][xrand-1] = maze[yrand][xrand-1] | 64
 
-    if siderand == 1: # set cell to the left closed also
-        if yrand != 7:
-            maze[yrand+1][xrand] = maze[yrand+1][xrand] | 128
+        if siderand == 1: # set cell to the left closed also
+            if yrand != 7:
+                maze[yrand+1][xrand] = maze[yrand+1][xrand] | 128
 
-    if siderand == 2: # set cell to the left closed also
-        if xrand !=7:
-            maze[yrand][xrand+1] = maze[yrand][xrand+1] | 16
+        if siderand == 2: # set cell to the left closed also
+            if xrand !=7:
+                maze[yrand][xrand+1] = maze[yrand][xrand+1] | 16
 
-    if siderand == 3: # set cell to the left closed also
-        if yrand != 0:
-            maze[yrand-1][xrand] = maze[yrand-1][xrand] | 32
+        if siderand == 3: # set cell to the left closed also
+            if yrand != 0:
+                maze[yrand-1][xrand] = maze[yrand-1][xrand] | 32
 
 
 # Add 7 'diamonds' to find as number 1
@@ -152,6 +153,19 @@ for diamond in range (0,7):
     maze[yrand][xrand] = maze[yrand][xrand] | 1
 
 
+draw_sense(maze[y][x])
+# if a corner put an extra dot in the corner.
+if y == 0 and x == 0:
+    sense.set_pixel(1,1,255,0,0)
+elif y == 0 and x == 7:
+    sense.set_pixel(6,1,255,0,0)
+elif y == 7 and x == 0:
+    sense.set_pixel(1,6,255,0,0)
+elif y == 7 and x == 7:
+    sense.set_pixel(6,6,255,255,255)
+            
+if maze[y][x] & 1 == 1: # draw diamond
+    sense.set_pixel(3,3,0,255,0)
   
 # main loop for program
 while running:
@@ -178,7 +192,7 @@ while running:
             elif y == 7 and x == 7:
                 sense.set_pixel(6,6,255,255,255)
             
-            if maze[y][x] & 1 == 1:
+            if maze[y][x] & 1 == 1: # draw diamond
                 sense.set_pixel(3,3,0,255,0)
                
             # if [return pressed] exit program
