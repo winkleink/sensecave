@@ -26,32 +26,32 @@ sleep(1)
 # setting up pygame - will change to dummy later so can work headless
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 pygame.init()
-# pygame.display.set_mode((320, 240))
+# pygame.display.set_mode((1,1))
+# display = pygame.display.set_mode((320, 240))
 
 sense = SenseHat()
 sense.clear()  # Blank the LED matrix
 sense.low_light = True
-
-# variable to stay in program
-running = True
 
 # Some colours not used yet
 r = (255,0,0)
 g = (0,255,0)
 b = (0,0,0)
 w = (255,255,255)
-score = 0
+score = 0 # have you found 7 emeralds
+running = True # is the program running
+ingame = True # is a game being played
 
 # starting x and y co-ordinates to define maze cell.
 # for true x,y then y is first in maze[]
-x = 7
+x = 1
 y = 7
 
 # starting x and y for players dot in a cell
 dotx = 2
 doty = 2
 
-# Function to draw a single cell. With the openenings if there are any
+# Function to draw a single cell. With the openings if there are any
 def draw_sense(cell):
     sense.clear()  # Blank the LED matrix
    
@@ -128,13 +128,13 @@ def handle_event(event, x,y):
 def move_dot(pitch,roll,dotx,doty):
     new_dotx = dotx
     new_doty = doty
-    if 1 < pitch < 179:
+    if 1 < pitch < 170:
         new_dotx -= 1
-    elif 359 > pitch > 179:
+    elif 359 > pitch > 189:
         new_dotx += 1
-    if 1 < roll < 179:
+    if 1 < roll < 170:
         new_doty += 1
-    elif 359 > roll > 179:
+    elif 359 > roll > 189:
         new_doty -= 1
     if new_dotx < -1:
 		new_dotx=-1
@@ -194,132 +194,146 @@ def add_diamonds():
         maze[yrand][xrand] = maze[yrand][xrand] | 1
     
 
+while running:
+    x = 1
+    y = 7
+    dotx = 3
+    doty = 3
+    score = 0
+ 
+    ingame = True
+    sleep(1)
+    sense.show_message("Next Game in...", text_colour=[255,255,255])
 
+    for loop in range (5,0,-1):
+        sense.show_message(str(loop), text_colour=[255,255,255])
 
 # blank empty edge
-maze = [[144,128,128,128,128,128,128,192],
-        [16,0,0,0,0,0,0,64],
-        [16,0,0,0,0,0,0,64],
-        [16,0,0,0,0,0,0,64],
-        [16,0,0,0,0,0,0,64],
-        [16,0,0,0,0,0,0,64],
-        [16,0,0,0,0,0,0,64],
-        [48,32,32,32,32,32,32,96]]
+    maze = [[144,128,128,128,128,128,128,192],
+            [16,0,0,0,0,0,0,64],
+            [16,0,0,0,0,0,0,64],
+            [16,0,0,0,0,0,0,64],
+            [16,0,0,0,0,0,0,64],
+            [16,0,0,0,0,0,0,64],
+            [16,0,0,0,0,0,0,64],
+            [48,32,32,32,32,32,32,96]]
 
 # add the internal walls
-add_walls()
+    add_walls()
 
 # add the diamonds
-add_diamonds()
+    add_diamonds()
 
-draw_sense(maze[y][x])
-  
+    draw_sense(maze[y][x])
+    sleep (2)
 # main loop for program
-while running:
-    print "dotx = " + str(dotx) + "  | doty " + str(doty)
-    pitch = sense.get_orientation()['pitch']
-    roll = sense.get_orientation()['roll']
-#    print "pitch " + str(pitch)
-#    print "roll " + str(roll )
-    sense.set_pixel(dotx,doty,0,0,0)
-    old_dotx = dotx
-    old_doty = doty
-    dotx,doty = move_dot(pitch,roll,dotx,doty)
-    print "newdotx = " + str(dotx) + " | newdoty = " + str(doty)
-    if (dotx > -1 and dotx <8) and (doty > -1 and doty <8):
-        check_dot = sense.get_pixel(dotx, doty)
-        if check_dot == [248,0,0]:
-            print "red"
-            dotx = old_dotx
-            doty = old_doty
+    while ingame:
+        print "dotx = " + str(dotx) + "  | doty " + str(doty)
+        pitch = sense.get_orientation()['pitch']
+        roll = sense.get_orientation()['roll']
+#       print "pitch " + str(pitch)
+#       print "roll " + str(roll )
+        sense.set_pixel(dotx,doty,0,0,0)
+        old_dotx = dotx
+        old_doty = doty
+        dotx,doty = move_dot(pitch,roll,dotx,doty)
+        print "newdotx = " + str(dotx) + " | newdoty = " + str(doty)
+        if (dotx > -1 and dotx <8) and (doty > -1 and doty <8):
+            check_dot = sense.get_pixel(dotx, doty)
+            if check_dot == [248,0,0]:
+                print "red"
+                dotx = old_dotx
+                doty = old_doty
         
-        if check_dot == [0,252,0]: # green
-            score +=1
-            sense.show_letter(str(score))
-            sleep(1)
-            maze[y][x] = maze[y][x] - 1
-            sense.clear
-            draw_sense(maze[y][x])
-        
-        # Have you found all 7
-            if score == 7:
-                sense.clear
-                sense.show_message("Go to Exit!", text_colour=[255, 0, 0])
+            if check_dot == [0,252,0]: # green
+                score +=1
+                sense.show_letter(str(score))
+                sleep(1)
+                maze[y][x] = maze[y][x] - 1
                 sense.clear
                 draw_sense(maze[y][x])
+        
+            # Have you found all 7
+                if score == 7:
+                    sense.clear
+                    sense.show_message("Go to Exit!", text_colour=[255, 0, 0])
+                    sense.clear
+                    draw_sense(maze[y][x])
             
-        if check_dot == [248, 252, 248 ] and score == 7: # white
-            sense.clear
-            sense.show_message("You have escaped with alll the diamonds!  Well done", text_colour=[255,255,255])
-            running = False 
+            if check_dot == [248, 252, 248 ] and score == 7: # white
+                sense.clear
+                sense.show_message("You have escaped with alll the emeralds!  Well done", text_colour=[255,255,255])
+                ingame = False 
             
         
         
        # if at the edge - need to fix for 
-    if (dotx == 8 or dotx == -1 or doty == 8 or doty== -1):
+        if (dotx == 8 or dotx == -1 or doty == 8 or doty== -1):
        
-        print "I'm at the edge"    
-        if doty == -1:
-            print "doty inside = -1"
-            doty = 7
-            y -= 1
-            if y == -1:
-                y = 0
+            print "I'm at the edge"    
+            if doty == -1:
+                print "doty inside = -1"
+                doty = 7
+                y -= 1
+                if y == -1:
+                    y = 0
                 
-        elif doty == 8:
-            print "doty inside = 8"
-            doty = 0
-            y += 1
-            if y == 8:
-                y = 7
+            elif doty == 8:
+                print "doty inside = 8"
+                doty = 0
+                y += 1
+                if y == 8:
+                    y = 7
                 
-        elif dotx == -1:
-            print "dotx inside = -1"
-            dotx = 7
-            x -= 1
-            if x == -1:
-                x = 0
+            elif dotx == -1:
+                print "dotx inside = -1"
+                dotx = 7
+                x -= 1
+                if x == -1:
+                    x = 0
 
-        elif dotx == 8:
-            print "dotx inside = 8"
-            dotx = 0
-            x += 1
-            if x == 8:
-                x = 7
+            elif dotx == 8:
+                print "dotx inside = 8"
+                dotx = 0
+                x += 1
+                if x == 8:
+                    x = 7
                 
-        if dotx != old_dotx or doty != old_doty:
-            print "before drawing"
+            if dotx != old_dotx or doty != old_doty:
+                print "before drawing"
+                print "x " + str(x)
+                print "y " + str(y)
+                draw_sense(maze[y][x])
+
             print "x " + str(x)
             print "y " + str(y)
-            draw_sense(maze[y][x])
-
-        print "x " + str(x)
-        print "y " + str(y)
-        print "dotx " + str(dotx)
-        print "doty " + str(doty)
+            print "dotx " + str(dotx)
+            print "doty " + str(doty)
         
         
             
-    sense.set_pixel(dotx,doty,0,0,255)
-    sleep(0.15)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == KEYDOWN:
-            print "KEY DOWN"
-            if event.key == K_ESCAPE:
-                running = False
-            x,y = handle_event(event, x, y)
-            print x
-            print y
-            print maze[y][x]
-            # draw the cell
-            draw_sense(maze[y][x])
+        sense.set_pixel(dotx,doty,0,0,255)
+        sleep(0.15)
+#        pygame.event.pump()
+#        for event in pygame.event.get():
+#            if event.type == pygame.QUIT:
+#                ingame = False
+#            if event.type == KEYDOWN:
+#                print "KEY DOWN"
+#                if event.key == K_ESCAPE:
+#                    ingame = False
+#                x,y = handle_event(event, x, y)
+#                print x
+#                print y
+#                print maze[y][x]
+           # draw the cell
+#                draw_sense(maze[y][x])
 
                
-            # if [return pressed] exit program
-            if event.key == K_RETURN:
-                running = False            
+           # if [return pressed] exit program
+#                if event.key == K_RETURN:
+#                    imgame = False
+#                    running = False            
 
 print "EXIT!"            
 sense.clear()  # Blank the LED matrix
