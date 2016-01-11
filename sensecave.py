@@ -14,8 +14,8 @@
 from sense_hat import SenseHat
 import os
 from time import sleep
-import pygame  # See http://www.pygame.org/docs
-from pygame.locals import *
+# import pygame  # See http://www.pygame.org/docs
+# from pygame.locals import *
 from random import randint
 import math
 
@@ -24,8 +24,8 @@ print("Press Escape to quit")
 sleep(1)
 
 # setting up pygame - will change to dummy later so can work headless
-os.environ["SDL_VIDEODRIVER"] = "dummy"
-pygame.init()
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
+# pygame.init()
 # pygame.display.set_mode((1,1))
 # display = pygame.display.set_mode((320, 240))
 
@@ -98,30 +98,30 @@ def draw_sense(cell):
 
 
 # Move between cells based on key press - not needed for game, but useful cheat
-def handle_event(event, x,y):
-    if event.key == pygame.K_DOWN:
-        y +=1
-        if y == 8:
-				y = 7
+#def handle_event(event, x,y):
+#    if event.key == pygame.K_DOWN:
+#        y +=1
+#        if y == 8:
+#				y = 7
         
-    elif event.key == pygame.K_UP:
-        y -=1
-        if y == -1:
-				y = 0       
+#    elif event.key == pygame.K_UP:
+#        y -=1
+#        if y == -1:
+#				y = 0       
 
-    elif event.key == pygame.K_LEFT:
-        x -=1
-        if x == -1:
-				x = 0
+#    elif event.key == pygame.K_LEFT:
+#        x -=1
+#        if x == -1:
+#				x = 0
                 
-    elif event.key == pygame.K_RIGHT:
-        x +=1
-        if x == 8:
-				x = 7
+#    elif event.key == pygame.K_RIGHT:
+#        x +=1
+#        if x == 8:
+#				x = 7
    
         
 #    elif event.key == pygame.K_RETURN:
-    return (x, y)       
+#    return (x, y)       
 
 
 # move the players dot around the SenseHat
@@ -186,8 +186,8 @@ def add_diamonds():
     for diamond in range (0,7):
         xrand = randint(0,7)
         yrand = randint(0,7)
-
-        while maze[yrand][xrand] & 1 == 1:
+        # Keep picking new cells if a diamond is already in a cell or if the cell is enclosed.
+        while (maze[yrand][xrand] & 1 == 1) or (maze[yrand][xrand] & 240 == 240):
             xrand = randint(0,7)
             yrand = randint(0,7)
 
