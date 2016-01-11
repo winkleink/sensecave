@@ -1,14 +1,14 @@
 #!/usr/bin/python
 
 # Simple little game using Sense Hat for cave exploring
-# 8 x 8 maze with 7 diamonds to find 
+# 8 x 8 maze with 7 green emeraldss to find 
 # Exit is bottom Right
 
 # top - 128
 # right - 64
 # bottom - 32
 # left - 16
-# diamond - 1
+# diamond - 1 and coloured green
 # exit is white bottom right of maze
 
 from sense_hat import SenseHat
@@ -19,16 +19,14 @@ from pygame.locals import *
 from random import randint
 import math
 
-# red as read 252,0,0
-# green as read 0,252,0
-# white as read 248, 252, 248 
 
 print("Press Escape to quit")
 sleep(1)
 
 # setting up pygame - will change to dummy later so can work headless
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 pygame.init()
-pygame.display.set_mode((320, 240))
+# pygame.display.set_mode((320, 240))
 
 sense = SenseHat()
 sense.clear()  # Blank the LED matrix
@@ -44,15 +42,16 @@ b = (0,0,0)
 w = (255,255,255)
 score = 0
 
-# starting x and y co-ordinates.
+# starting x and y co-ordinates to define maze cell.
 # for true x,y then y is first in maze[]
 x = 7
 y = 7
 
+# starting x and y for players dot in a cell
 dotx = 2
 doty = 2
 
-# Function to draw a single cell. Withe the opens if there
+# Function to draw a single cell. With the openenings if there are any
 def draw_sense(cell):
     sense.clear()  # Blank the LED matrix
    
@@ -98,7 +97,7 @@ def draw_sense(cell):
         sense.set_pixel(3,3,0,255,0)
 
 
-# Move between cells based on key press
+# Move between cells based on key press - not needed for game, but useful cheat
 def handle_event(event, x,y):
     if event.key == pygame.K_DOWN:
         y +=1
@@ -125,6 +124,7 @@ def handle_event(event, x,y):
     return (x, y)       
 
 
+# move the players dot around the SenseHat
 def move_dot(pitch,roll,dotx,doty):
     new_dotx = dotx
     new_doty = doty
@@ -181,6 +181,18 @@ def add_walls():
                 if yrand != 0:
                     maze[yrand-1][xrand] = maze[yrand-1][xrand] | 32
 
+def add_diamonds():
+    # Add 7 'diamonds' to find as number 1
+    for diamond in range (0,7):
+        xrand = randint(0,7)
+        yrand = randint(0,7)
+
+        while maze[yrand][xrand] & 1 == 1:
+            xrand = randint(0,7)
+            yrand = randint(0,7)
+
+        maze[yrand][xrand] = maze[yrand][xrand] | 1
+    
 
 
 
@@ -195,19 +207,10 @@ maze = [[144,128,128,128,128,128,128,192],
         [48,32,32,32,32,32,32,96]]
 
 # add the internal walls
-# add_walls()
+add_walls()
 
-# Add 7 'diamonds' to find as number 1
-for diamond in range (0,7):
-    xrand = randint(0,7)
-    yrand = randint(0,7)
-
-    while maze[yrand][xrand] & 1 == 1:
-        xrand = randint(0,7)
-        yrand = randint(0,7)
-
-    maze[yrand][xrand] = maze[yrand][xrand] | 1
-
+# add the diamonds
+add_diamonds()
 
 draw_sense(maze[y][x])
   
@@ -248,7 +251,7 @@ while running:
         if check_dot == [248, 252, 248 ] and score == 7: # white
             sense.clear
             sense.show_message("You have escaped with alll the diamonds!  Well done", text_colour=[255,255,255])
-            running = 0 
+            running = False 
             
         
         
